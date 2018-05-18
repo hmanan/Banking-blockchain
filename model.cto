@@ -1,0 +1,81 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+namespace org.acme.BankingGroup
+
+participant Bank identified by memberID {
+  o String memberID
+  o HQAddress address
+  o Double accountBalance
+}
+
+concept HQAddress {
+    o String City
+    o String Country
+    o String CEO
+}
+
+
+abstract participant Group identified by participantId {
+  o String participantId
+}
+
+participant RecordKeeper extends Group{
+}
+
+participant Auditor extends Group{
+}
+
+participant Regulator extends Group{
+}
+
+
+//------------------- asset----------------------- //
+
+asset Trans identified by transID {
+  o String transID
+  --> Bank from
+  --> Bank to
+  --> RecordKeeper RK
+  --> Auditor auditor      //over 50K
+  --> Regulator regulator  //over 50k
+  o DateTime transTime
+  o Double amount
+  o status status
+}
+
+enum status {
+  o PENDING
+  o APPROVED
+  o DENIED
+  o INVESTIGATING 
+  o CANCELLED
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

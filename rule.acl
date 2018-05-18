@@ -1,0 +1,65 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rule BtoBTransDENY {
+	description: "Allow banks to send $$"
+	participant(b1): "org.acme.BankingGroup.Bank"
+	operation: CREATE,DELETE,READ
+	resource(b2): "org.acme.BankingGroup.Trans"
+	condition: (b1.getIdentifier()==b2.to.getIdentifier())//only if it is creating or deleting a trans to a diff bank
+	action: DENY
+}
+
+rule BtoBTransAllow {
+	description: "Allow banks to send $$"
+	participant(b1): "org.acme.BankingGroup.Bank"
+	operation: CREATE,DELETE,READ
+	resource(b2): "org.acme.BankingGroup.Trans"
+	condition: (b1.getIdentifier()!=b2.to.getIdentifier())//only if it is creating or deleting a trans to a diff bank
+	action: ALLOW
+}
+
+rule BtoBViewHistory{
+	description: "Allow banks to view their own trans"
+	participant(b1): "org.acme.BankingGroup.Bank"
+	operation: READ
+	resource(b2): "org.acme.BankingGroup.Trans#to"
+	condition: (b1.getIdentifier()==b2.getIdentifier())//only if it is looking at its own stuff
+	action: ALLOW
+}
+
+//special access//
+rule NetworkAdminUser {
+    description: "Grant business network administrators full access to user resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "**"
+    action: ALLOW
+}
+
+rule NetworkAdminSystem {
+    description: "Grant business network administrators full access to system resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "org.hyperledger.composer.system.**"
+    action: ALLOW
+}
+
+rule AllAccess {
+    description: "AllAccess - grant everything to everybody."
+    participant: "org.hyperledger.composer.system.Participant"
+    operation: ALL
+    resource: "org.hyperledger.composer.system.**"
+    action: ALLOW
+}
